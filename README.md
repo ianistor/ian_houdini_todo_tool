@@ -1,4 +1,4 @@
-# To-DO tool for Houdini
+# To-Do tool for Houdini
 ![alt text](https://github.com/ianistor/ian_houdini_todo/blob/main/todo_ui2.png)
 ## Features
 
