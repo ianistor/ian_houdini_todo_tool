@@ -1,15 +1,17 @@
 import hou
 import os
 import json
-from PySide2.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLineEdit, QPushButton, QListWidget, QListWidgetItem, QMessageBox, QDialog, QMenu, QAction, QLabel, QTextEdit
+from PySide2.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLineEdit, QPushButton, QListWidget, QListWidgetItem, QMessageBox, QDialog, QMenu, QAction, QLabel, QTextEdit, QTextBrowser
 from PySide2 import QtWidgets, QtCore
 
+
+style = "C:/Users/ndrni/OneDrive/Desktop/stylesheet.css"
 class TodoListApp(QDialog):
     def __init__(self):
         super().__init__(None, QtCore.Qt.WindowStaysOnTopHint)
-        self.setWindowTitle('Todo List')
+        self.setWindowTitle('IAN To-Do')
         self.setGeometry(100, 100, 400, 300)
-
+        self.center()
         self.todo_file = None  # Initialize todo file path
         self.loadTodoList()
         self.initUI()
@@ -18,6 +20,18 @@ class TodoListApp(QDialog):
         hou.hipFile.addEventCallback(self.onHipFileLoad)
 
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
+        self.comment_dialog = None  # Initialize comment dialog
+
+        # Apply stylesheet
+        self.setStyleSheetFromFile(style)
+
+    def center(self):
+        # Get the main screen's geometry
+        screen_geometry = QtWidgets.QDesktopWidget().screenGeometry()
+        # Calculate the center point of the screen
+        center_point = screen_geometry.center()
+        # Set the geometry of the window to be centered on the screen
+        self.move(center_point - self.rect().center())
 
     def initUI(self):
         # Layout
@@ -43,6 +57,40 @@ class TodoListApp(QDialog):
 
         self.setLayout(layout)
 
+        # Connect double-click event to show or update comment dialog
+        self.todo_list.itemDoubleClicked.connect(self.showOrUpdateCommentDialog)
+
+    def mousePressEvent(self, event):
+        if self.comment_dialog and self.comment_dialog.isVisible():
+            self.comment_dialog.close()
+        super().mousePressEvent(event)
+
+    def showOrUpdateCommentDialog(self, item):
+            index = self.todo_list.indexFromItem(item).row()
+            comment = self.todo_data[index].get('comment', '')
+            if self.comment_dialog and self.comment_dialog.isVisible():
+                current_index = self.comment_dialog.current_index
+                if index == current_index:
+                    self.comment_dialog.updateComment(index, comment)
+                else:
+                    self.comment_dialog.close()
+                    self.comment_dialog = CommentDialog(comment, index)
+                    self.comment_dialog.move(self.geometry().right(), self.geometry().top())
+                    self.comment_dialog.show()
+            else:
+                self.comment_dialog = CommentDialog(comment, index)
+                self.comment_dialog.move(self.geometry().right(), self.geometry().top())
+                self.comment_dialog.show()
+
+    def showContextMenu(self, pos):
+        menu = QMenu(self)
+        notes_action = menu.addAction("Show Notes")
+        action = menu.exec_(self.todo_list.mapToGlobal(pos))
+        if action == notes_action:
+            selected_items = self.todo_list.selectedItems()
+            if selected_items:
+                index = self.todo_list.indexFromItem(selected_items[0]).row()
+                self.showOrUpdateCommentDialog(selected_items[0])
     def loadTodoList(self):
         hipfile = hou.hipFile.path()
         hipfile_name = os.path.basename(hipfile)
@@ -117,27 +165,40 @@ class TodoListApp(QDialog):
         if action == notes_action:
             selected_items = self.todo_list.selectedItems()
             if selected_items:
-                index = self.todo_list.indexFromItem(selected_items[0]).row()
-                comment_dialog = CommentDialog(self.todo_data[index].get('comment', ''))
-                if comment_dialog.exec_():
-                    self.todo_data[index]['comment'] = comment_dialog.getComment()
-                    self.saveTodoList()
+                self.showOrUpdateCommentDialog(selected_items[0])
+
+                
+    def updateComment(self, index, comment):
+        if index < len(self.todo_data):
+            self.todo_data[index]['comment'] = comment
+            self.saveTodoList()
+
+    def setStyleSheetFromFile(self, path):
+        with open(path, 'r') as file:
+            self.setStyleSheet(file.read())
 
 class CommentDialog(QDialog):
-    def __init__(self, comment):
+    def __init__(self, comment, index):
         super().__init__()
-        self.setWindowTitle('Comment')
+        self.setWindowTitle('Notes')
         self.setGeometry(200, 200, 300, 200)
+        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
 
+        self.setWindowFlag(QtCore.Qt.WindowTitleHint, False)
+
+        self.current_index = index  # Store the current index
         self.comment = QTextEdit()
-        self.comment.setPlainText(comment)
+        self.comment.setTextInteractionFlags(QtCore.Qt.TextEditorInteraction)  # Enable hyperlink support
+        # self.comment.setAcceptRichText(True)
+        self.comment.setText(comment)
+        # self.comment.setPlainText(comment)
 
         layout = QVBoxLayout()
         layout.addWidget(self.comment)
 
         button_layout = QHBoxLayout()
         save_button = QPushButton('Save')
-        save_button.clicked.connect(self.accept)
+        save_button.clicked.connect(lambda: self.accept(index))
         cancel_button = QPushButton('Cancel')
         cancel_button.clicked.connect(self.reject)
         button_layout.addWidget(save_button)
@@ -146,8 +207,21 @@ class CommentDialog(QDialog):
         layout.addLayout(button_layout)
         self.setLayout(layout)
 
+        # Apply stylesheet
+        self.setStyleSheetFromFile(style)
+
     def getComment(self):
         return self.comment.toPlainText()
+
+    def accept(self, index):
+        comment = self.getComment()
+        super().accept()
+        if comment:
+            todo_app.updateComment(index, comment)
+
+    def setStyleSheetFromFile(self, path):
+        with open(path, 'r') as file:
+            self.setStyleSheet(file.read())
 
 # Create and show the todo app
 app = QApplication.instance() or QApplication([])
