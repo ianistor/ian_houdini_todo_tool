@@ -13,3 +13,4 @@ On each hip file a new _todo.json file gets created, so if you swap between .hip
 • Notes features (each "task" can hold aditional information as notes)\
 ![alt text](https://github.com/ianistor/ian_houdini_todo/blob/main/todo_ui.png)\
 
+Stylesheet credits : https://github.com/Lumyo/darkorange-pyside-stylesheet
