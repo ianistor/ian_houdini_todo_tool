@@ -1,7 +1,7 @@
 # To-Do tool for Houdini
 ![alt text](https://github.com/ianistor/ian_houdini_todo/blob/main/todo_ui2.png)
 Wrote a quick tool to create a TO-DO list in Houdini using PySide.
-I'll be honest, the need for it was a bit forced as Houdini's own post it notes do the trick most of the time, but i wanted to see how i would takle this.
+I'll be honest, the need for it was a bit forced as Houdini's own post it notes do the trick most of the time, but i wanted to see how i would tackle this.
 I'm thinking this can be a good base for a feedback tool/or jira/shotgun integration tho.
 
 ## Features
