@@ -4,8 +4,8 @@ import json
 import PySide2.QtWidgets as QtWidgets
 from PySide2 import QtCore
 
-style = "C:/Users/ndrni/OneDrive/Desktop/stylesheet.css"
-
+style = "C:/Desktop/stylesheet.css" # Replace this with your own stylesheet
+credit_for_stylesheet = "https://github.com/Lumyo/darkorange-pyside-stylesheet" 
 
 
 class TodoListApp(QtWidgets.QDialog):
