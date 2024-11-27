@@ -79,15 +79,51 @@ class TodoListApp(QtWidgets.QDialog):
             self.comment_dialog.move(self.geometry().right(), self.geometry().top())
             self.comment_dialog.show()
 
+    # Add rename function
+    def renameTodoItem(self, item):
+        index = self.todo_list.indexFromItem(item).row()
+        current_task = self.todo_data[index]['task']
+        new_task, ok = QtWidgets.QInputDialog.getText(self, 'Rename Task', 'Enter new task name:', text=current_task)
+        if ok and new_task.strip():
+            self.todo_data[index]['task'] = new_task.strip()
+            self.saveTodoList()
+            self.populateTodoList()
+        elif ok:
+            QtWidgets.QMessageBox.warning(self, 'Warning', 'Task name cannot be empty!')
+    
+    # Add delete entry function
+    def deleteTodoItem(self, item):
+        index = self.todo_list.indexFromItem(item).row()
+        reply = QtWidgets.QMessageBox.question(
+            self,
+            'Confirmation',
+            f'Are you sure you want to delete the task "{self.todo_data[index]["task"]}"?',
+            QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,
+            QtWidgets.QMessageBox.No
+        )
+        if reply == QtWidgets.QMessageBox.Yes:
+            del self.todo_data[index]
+            self.saveTodoList()
+            self.populateTodoList()
+    
+    # Modify the context menu to include Rename and Delete
     def showContextMenu(self, pos):
         menu = QtWidgets.QMenu(self)
         notes_action = menu.addAction("Show Notes")
+        rename_action = menu.addAction("Rename Task")
+        delete_action = menu.addAction("Delete Task")
+    
         action = menu.exec_(self.todo_list.mapToGlobal(pos))
-        if action == notes_action:
-            selected_items = self.todo_list.selectedItems()
-            if selected_items:
-                index = self.todo_list.indexFromItem(selected_items[0]).row()
-                self.showOrUpdateCommentDialog(selected_items[0])
+        selected_items = self.todo_list.selectedItems()
+    
+        if selected_items:
+            item = selected_items[0]
+            if action == notes_action:
+                self.showOrUpdateCommentDialog(item)
+            elif action == rename_action:
+                self.renameTodoItem(item)
+            elif action == delete_action:
+                self.deleteTodoItem(item)
 
     def loadTodoList(self):
         hipfile = hou.hipFile.path()
