@@ -4,12 +4,6 @@ import json
 import PySide2.QtWidgets as QtWidgets
 from PySide2 import QtCore
 
-style = "C:/Desktop/stylesheet.css" # Replace this with your own stylesheet
-credit_for_stylesheet = "https://github.com/Lumyo/darkorange-pyside-stylesheet" 
-
-# TODO: Add rename function
-# TODO: Add delete entry function
-
 class TodoListApp(QtWidgets.QDialog):
     def __init__(self, parent=None):
         super(TodoListApp, self).__init__(parent)
@@ -25,9 +19,6 @@ class TodoListApp(QtWidgets.QDialog):
 
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         self.comment_dialog = None
-
-        # Apply stylesheet
-        self.setStyleSheetFromFile(style)
 
     def center(self):
         screen_geometry = QtWidgets.QDesktopWidget().screenGeometry()
@@ -205,10 +196,6 @@ class TodoListApp(QtWidgets.QDialog):
             self.todo_data[index]['comment'] = comment
             self.saveTodoList()
 
-    def setStyleSheetFromFile(self, path):
-        with open(path, 'r') as file:
-            self.setStyleSheet(file.read())
-
 class CommentDialog(QtWidgets.QDialog):
     def __init__(self, comment, index):
         super().__init__()
@@ -235,8 +222,6 @@ class CommentDialog(QtWidgets.QDialog):
         layout.addLayout(button_layout)
         self.setLayout(layout)
 
-        self.setStyleSheetFromFile(style)
-
     def getComment(self):
         return self.comment.toPlainText()
 
@@ -245,10 +230,6 @@ class CommentDialog(QtWidgets.QDialog):
         super().accept()
         if comment:
             todo_app.updateComment(index, comment)
-
-    def setStyleSheetFromFile(self, path):
-        with open(path, 'r') as file:
-            self.setStyleSheet(file.read())
 
 app = QtWidgets.QApplication.instance()
 todo_app = TodoListApp()
