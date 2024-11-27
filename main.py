@@ -7,6 +7,8 @@ from PySide2 import QtCore
 style = "C:/Desktop/stylesheet.css" # Replace this with your own stylesheet
 credit_for_stylesheet = "https://github.com/Lumyo/darkorange-pyside-stylesheet" 
 
+# TODO: Add rename function
+# TODO: Add delete entry function
 
 class TodoListApp(QtWidgets.QDialog):
     def __init__(self, parent=None):
