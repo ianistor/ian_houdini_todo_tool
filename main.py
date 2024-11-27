@@ -182,15 +182,6 @@ class TodoListApp(QtWidgets.QDialog):
         self.loadTodoList()
         self.populateTodoList()
 
-    def showContextMenu(self, pos):
-        menu = QtWidgets.QMenu(self)
-        notes_action = menu.addAction("Notes")
-        action = menu.exec_(self.todo_list.mapToGlobal(pos))
-        if action == notes_action:
-            selected_items = self.todo_list.selectedItems()
-            if selected_items:
-                self.showOrUpdateCommentDialog(selected_items[0])
-
     def updateComment(self, index, comment):
         if index < len(self.todo_data):
             self.todo_data[index]['comment'] = comment
