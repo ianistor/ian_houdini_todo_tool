@@ -1,3 +1,5 @@
+# for pyside 2
+
 import hou
 import os
 import json
