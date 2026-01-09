@@ -704,7 +704,7 @@ class CommentDialog(QtWidgets.QDialog):
 
 app = QtWidgets.QApplication.instance() or QtWidgets.QApplication([])
 app.setStyleSheet(css)
-app.setStyle("Fusion")
+#app.setStyle("Fusion")
 
 todo_app = TodoListApp()
 todo_app.show()
