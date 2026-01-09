@@ -707,6 +707,5 @@ class CommentDialog(QtWidgets.QDialog):
 
 app = QtWidgets.QApplication.instance()
 app.setStyleSheet( css )
-app.setStyle("plastique")
 todo_app = TodoListApp()
 todo_app.show()
